@@ -23,7 +23,11 @@ const Ingredients = () => {
     })
   }, [])
 
-  const addIngredientHander = (ingredient) => {
+  useEffect(() => {
+    console.log('Renders Ingredients', userIngredients)
+  }, [userIngredients])
+
+  const addIngredientHandler = (ingredient) => {
     fetch(
       'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json ',
       {
@@ -43,7 +47,7 @@ const Ingredients = () => {
       })
   }
 
-  const removeIngredientHander = (ingredientId) => {
+  const removeIngredientHandler = (ingredientId) => {
     setUserIngredients((prevIngredients) =>
       prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
     )
@@ -51,13 +55,13 @@ const Ingredients = () => {
 
   return (
     <div className="App">
-      <IngredientForm onAddIngredient={addIngredientHander} />
+      <IngredientForm onAddIngredient={addIngredientHandler} />
 
       <section>
         <Search />
         <IngredientList
           ingredients={userIngredients}
-          onRemoveItem={removeIngredientHander}
+          onRemoveItem={removeIngredientHandler}
         />
       </section>
     </div>
