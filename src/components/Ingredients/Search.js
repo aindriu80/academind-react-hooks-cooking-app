@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import Card from '../UI/Card'
 import './Search.css'
@@ -6,27 +6,33 @@ import './Search.css'
 const Search = React.memo((props) => {
   const { onLoadIngredients } = props
   const [enteredFiltered, setEnteredFiltered] = useState('')
+  const inputRef = useRef()
 
   useEffect(() => {
-    const query =
-      enteredFiltered.length === 0
-        ? ''
-        : `?orderBy="title"&equalTo="${enteredFiltered}"`
-    fetch(
-      'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json ' +
-        query
-    ).then((responseData) => {
-      const loadedIngredients = []
-      for (const key in responseData) {
-        loadedIngredients.push({
-          id: key,
-          title: responseData[key].title,
-          amount: responseData[key].amount,
+    setTimeout(() => {
+      if (enteredFiltered === inputRef.current.value) {
+        const query =
+          enteredFiltered.length === 0
+            ? ''
+            : `?orderBy="title"&equalTo="${enteredFiltered}"`
+        fetch(
+          'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json ' +
+            query)
+          .then(response => response.json())
+          .then(responseData => {
+          const loadedIngredients = []
+          for (const key in responseData) {
+            loadedIngredients.push({
+              id: key,
+              title: responseData[key].title,
+              amount: responseData[key].amount,
+            })
+          }
+          onLoadIngredients(loadedIngredients)
         })
       }
-      onLoadIngredients(loadedIngredients)
-    })
-  }, [enteredFiltered, onLoadIngredients])
+    }, 500)
+  }, [enteredFiltered, onLoadIngredients, inputRef])
 
   return (
     <section className="search">
@@ -34,6 +40,7 @@ const Search = React.memo((props) => {
         <div className="search-input">
           <label>Filter by Title</label>
           <input
+            ref={inputRef}
             type="text"
             value={enteredFiltered}
             onChange={(event) => setEnteredFiltered(event.target.value)}
