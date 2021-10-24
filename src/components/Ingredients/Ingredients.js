@@ -2,11 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react'
 
 import IngredientForm from './IngredientForm'
 import IngredientList from './IngredientList'
+import ErrorModal from '../UI/ErrorModal'
 import Search from './Search'
 
 const Ingredients = () => {
   const [userIngredients, setUserIngredients] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState()
 
   useEffect(() => {
     console.log('Renders Ingredients', userIngredients)
@@ -45,16 +47,26 @@ const Ingredients = () => {
       {
         method: 'DELETE',
       }
-    ).then((response) => {
-      setIsLoading(false)
-      setUserIngredients((prevIngredients) =>
-        prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
-      )
-    })
+    )
+      .then((response) => {
+        setIsLoading(false)
+        setUserIngredients((prevIngredients) =>
+          prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
+        )
+      })
+      .catch((error) => {
+        setError('Something went wrong:S', error.message)
+        setIsLoading(false)
+      })
+  }
+
+  const clearError = () => {
+    setError(null)
   }
 
   return (
     <div className="App">
+      {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
       <IngredientForm
         onAddIngredient={addIngredientHandler}
         loading={isLoading}
