@@ -6,22 +6,7 @@ import Search from './Search'
 
 const Ingredients = () => {
   const [userIngredients, setUserIngredients] = useState([])
-
-  // useEffect(() => {
-  //   fetch(
-  //     'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json '
-  //   ).then((responseData) => {
-  //     const loadedIngredients = []
-  //     for (const key in responseData) {
-  //       loadedIngredients.push({
-  //         id: key,
-  //         title: responseData[key].title,
-  //         amount: responseData[key].amount,
-  //       })
-  //     }
-  //     setUserIngredients(loadedIngredients)
-  //   })
-  // }, [])
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     console.log('Renders Ingredients', userIngredients)
@@ -32,6 +17,7 @@ const Ingredients = () => {
   }, [])
 
   const addIngredientHandler = (ingredient) => {
+    setIsLoading(true)
     fetch(
       'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json ',
       {
@@ -41,6 +27,7 @@ const Ingredients = () => {
       }
     )
       .then((response) => {
+        setIsLoading(false)
         return response.json()
       })
       .then((responseData) => {
@@ -52,12 +39,14 @@ const Ingredients = () => {
   }
 
   const removeIngredientHandler = (ingredientId) => {
+    setIsLoading(true)
     fetch(
       `https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients/${ingredientId}.json`,
       {
         method: 'DELETE',
       }
     ).then((response) => {
+      setIsLoading(false)
       setUserIngredients((prevIngredients) =>
         prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
       )
@@ -66,7 +55,10 @@ const Ingredients = () => {
 
   return (
     <div className="App">
-      <IngredientForm onAddIngredient={addIngredientHandler} />
+      <IngredientForm
+        onAddIngredient={addIngredientHandler}
+        loading={isLoading}
+      />
 
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
