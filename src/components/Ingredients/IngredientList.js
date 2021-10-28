@@ -1,8 +1,9 @@
-import React from 'react';
+import React from 'react'
 
-import './IngredientList.css';
+import './IngredientList.css'
 
-const IngredientList = (props) => {
+const IngredientList = React.memo((props) => {
+  console.log('Rendering Ingredient List ')
   console.log(props.ingredients)
   if (props.ingredients) {
     return (
@@ -21,6 +22,6 @@ const IngredientList = (props) => {
   } else {
     return <p>nothing</p>
   }
-}
+})
 
 export default IngredientList
