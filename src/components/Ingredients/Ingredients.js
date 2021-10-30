@@ -21,52 +21,73 @@ const ingredientReducer = (currentIngredients, action) => {
 
 const Ingredients = () => {
   const [userIngredients, dispatch] = useReducer(ingredientReducer, [])
-  const { isLoading, error, data, sendRequest } = useHttp()
+  const { isLoading, error, data, sendRequest, reqExtra, reqIdentifier } =
+    useHttp()
 
   // const [userIngredients, setUserIngredients] = useState([])
   // const [isLoading, setIsLoading] = useState(false)
   // const [error, setError] = useState()
 
   useEffect(() => {
-    console.log('Renders Ingredients', userIngredients)
-  }, [userIngredients])
+    if (!isLoading && !error && reqIdentifier === 'REMOVE_INGREDIENT') {
+      dispatch({ type: 'DELETE', id: reqExtra })
+    } else if (!isLoading && !error && reqIdentifier === 'ADD_INGREDIENT') {
+      dispatch({
+        type: 'ADD',
+        ingredient: { id: data.name, ...reqExtra },
+      })
+    }
+  }, [data, reqExtra, reqIdentifier, isLoading, error])
 
   const filteredIngredientsHandler = useCallback((filteredIngredients) => {
     // setUserIngredients(filteredIngredients)
     dispatch({ type: 'SET', ingredients: filteredIngredients })
   }, [])
 
-  const addIngredientHandler = useCallback((ingredient) => {
-    // dispatchHttp({ type: 'SEND' })
-    // fetch(
-    //   'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json ',
-    //   {
-    //     method: 'POST',
-    //     body: JSON.stringify(ingredient),
-    //     headers: { 'Content-Type': 'application/json' },
-    //   }
-    // )
-    //   .then((response) => {
-    //     dispatchHttp({ type: 'RESPONSE' })
-    //     return response.json()
-    //   })
-    //   .then((responseData) => {
-    //     // setUserIngredients((prevIngredients) => [
-    //     //   ...prevIngredients,
-    //     //   { id: responseData.name, ...ingredient },
-    //     // ])
-    //     dispatch({
-    //       type: 'ADD',
-    //       ingredient: { id: responseData.name, ...ingredient },
-    //     })
-    //   })
-  }, [])
+  const addIngredientHandler = useCallback(
+    (ingredient) => {
+      sendRequest(
+        'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json',
+        'POST',
+        JSON.stringify(ingredient),
+        'ADD_INGREDIENT'
+      )
+
+      // dispatchHttp({ type: 'SEND' })
+      // fetch(
+      //   'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json' ,
+      //   {
+      //     method: 'POST',
+      //     body: JSON.stringify(ingredient),
+      //     headers: { 'Content-Type': 'application/json' },
+      //   }
+      // )
+      //   .then((response) => {
+      //     dispatchHttp({ type: 'RESPONSE' })
+      //     return response.json()
+      //   })
+      //   .then((responseData) => {
+      //     // setUserIngredients((prevIngredients) => [
+      //     //   ...prevIngredients,
+      //     //   { id: responseData.name, ...ingredient },
+      //     // ])
+      //     dispatch({
+      //       type: 'ADD',
+      //       ingredient: { id: responseData.name, ...ingredient },
+      //     })
+      //   })
+    },
+    [sendRequest]
+  )
 
   const removeIngredientHandler = useCallback(
     (ingredientId) => {
       sendRequest(
         `https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients/${ingredientId}.json`,
-        'DELETE'
+        'DELETE',
+        null,
+        ingredientId,
+        'REMOVE_INGREDIENT'
       )
     },
     [sendRequest]
