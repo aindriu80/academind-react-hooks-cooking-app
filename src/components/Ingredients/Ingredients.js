@@ -21,12 +21,15 @@ const ingredientReducer = (currentIngredients, action) => {
 
 const Ingredients = () => {
   const [userIngredients, dispatch] = useReducer(ingredientReducer, [])
-  const { isLoading, error, data, sendRequest, reqExtra, reqIdentifier } =
-    useHttp()
-
-  // const [userIngredients, setUserIngredients] = useState([])
-  // const [isLoading, setIsLoading] = useState(false)
-  // const [error, setError] = useState()
+  const {
+    isLoading,
+    error,
+    data,
+    sendRequest,
+    reqExtra,
+    reqIdentifier,
+    clear,
+  } = useHttp()
 
   useEffect(() => {
     if (!isLoading && !error && reqIdentifier === 'REMOVE_INGREDIENT') {
@@ -40,7 +43,6 @@ const Ingredients = () => {
   }, [data, reqExtra, reqIdentifier, isLoading, error])
 
   const filteredIngredientsHandler = useCallback((filteredIngredients) => {
-    // setUserIngredients(filteredIngredients)
     dispatch({ type: 'SET', ingredients: filteredIngredients })
   }, [])
 
@@ -50,32 +52,9 @@ const Ingredients = () => {
         'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json',
         'POST',
         JSON.stringify(ingredient),
+        ingredient,
         'ADD_INGREDIENT'
       )
-
-      // dispatchHttp({ type: 'SEND' })
-      // fetch(
-      //   'https://academind-react-databases-app-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json' ,
-      //   {
-      //     method: 'POST',
-      //     body: JSON.stringify(ingredient),
-      //     headers: { 'Content-Type': 'application/json' },
-      //   }
-      // )
-      //   .then((response) => {
-      //     dispatchHttp({ type: 'RESPONSE' })
-      //     return response.json()
-      //   })
-      //   .then((responseData) => {
-      //     // setUserIngredients((prevIngredients) => [
-      //     //   ...prevIngredients,
-      //     //   { id: responseData.name, ...ingredient },
-      //     // ])
-      //     dispatch({
-      //       type: 'ADD',
-      //       ingredient: { id: responseData.name, ...ingredient },
-      //     })
-      //   })
     },
     [sendRequest]
   )
@@ -93,9 +72,9 @@ const Ingredients = () => {
     [sendRequest]
   )
 
-  const clearError = useCallback(() => {
-    // dispatchHttp({ type: 'CLEAR' })
-  }, [])
+  // const clearError = useCallback(() => {
+  //   clear()
+  // }, [])
 
   const ingredientList = useMemo(() => {
     return (
@@ -108,7 +87,7 @@ const Ingredients = () => {
 
   return (
     <div className="App">
-      {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
+      {error && <ErrorModal onClose={clear}>{error}</ErrorModal>}
       <IngredientForm
         onAddIngredient={addIngredientHandler}
         loading={isLoading}
